@@ -6,6 +6,14 @@ import { PageHeader } from "@/components/page-header";
 import { ProductGrid } from "@/components/product-card";
 import { categoryTrail, getCategoryBySlug, getCategoryTree, queryProducts } from "@/lib/products";
 import { categoryImage, pageMeta } from "@/lib/seo";
+import type { Category } from "@/lib/types";
+
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  const categories = await getCategoryTree();
+  return flatten(categories).map((category) => ({ slug: category.slug }));
+}
 
 export async function generateMetadata({
   params,
@@ -28,7 +36,11 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const [category, tree] = await Promise.all([getCategoryBySlug(slug), getCategoryTree()]);
   if (!category) notFound();
 
-  const list = await queryProducts({ categorySlug: slug, perPage: 24 });
+  const preview = await queryProducts({ categorySlug: slug, perPage: 24 });
+  const list =
+    preview.total > preview.items.length
+      ? await queryProducts({ categorySlug: slug, perPage: preview.total })
+      : preview;
   const trail = categoryTrail(tree, slug);
 
   return (
@@ -66,4 +78,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     </div>
     </>
   );
+}
+
+function flatten(categories: Category[]): Category[] {
+  return categories.flatMap((category) => [category, ...flatten(category.children)]);
 }

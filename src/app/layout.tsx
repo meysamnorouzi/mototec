@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { getPostCategoryTree } from "@/lib/posts";
 import { getAllProducts, getCategoryTree } from "@/lib/products";
 import { site } from "@/lib/site";
 
@@ -35,6 +36,7 @@ export const metadata: Metadata = {
     "اینترکام کلاه کاسکت",
     "بلوتوث موتور",
     "لوازم موتورسیکلت",
+    "مجله موتوتک",
   ],
   robots: {
     index: true,
@@ -60,10 +62,12 @@ export const metadata: Metadata = {
   formatDetection: { telephone: true, email: false, address: false },
 };
 
-export const revalidate = 120;
-
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [categories, products] = await Promise.all([getCategoryTree(), getAllProducts()]);
+  const [categories, products, topics] = await Promise.all([
+    getCategoryTree(),
+    getAllProducts(),
+    getPostCategoryTree(),
+  ]);
   const menuProducts = products.map((product) => ({
     id: product.id,
     slug: product.slug,
@@ -116,12 +120,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <main id="content" className="flex-1 pb-24 md:pb-0">
           {children}
         </main>
-        <SiteFooter categories={categories} />
+        <SiteFooter categories={categories} topics={topics} />
         <nav
           className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-ink/90 pb-[env(safe-area-inset-bottom)] text-white backdrop-blur-md md:hidden"
           aria-label="میانبر"
         >
-          <ul className="grid grid-cols-3 text-center text-xs">
+          <ul className="grid grid-cols-4 text-center text-xs">
             <li>
               <Link href="/" className="block px-2 py-3 active:bg-white/10">
                 خانه
@@ -130,6 +134,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <li>
               <Link href="/shop" className="block px-2 py-3 active:bg-white/10">
                 فروشگاه
+              </Link>
+            </li>
+            <li>
+              <Link href="/blog" className="block px-2 py-3 active:bg-white/10">
+                مجله
               </Link>
             </li>
             <li>

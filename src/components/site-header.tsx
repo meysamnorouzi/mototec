@@ -73,6 +73,9 @@ export function SiteHeader({ categories, products }: { categories: Category[]; p
               </div>
             ) : null}
           </div>
+          <Link href="/blog" className="hover:text-graphite">
+            مجله
+          </Link>
           <Link href="/about" className="hover:text-graphite">
             درباره ما
           </Link>
@@ -121,6 +124,11 @@ export function SiteHeader({ categories, products }: { categories: Category[]; p
                   </li>
                 ))}
               </ul>
+            </li>
+            <li>
+              <Link href="/blog" onClick={() => setOpen(false)} className="block rounded-2xl px-3 py-3 active:bg-ink/5">
+                مجله
+              </Link>
             </li>
             <li>
               <Link href="/about" onClick={() => setOpen(false)} className="block rounded-2xl px-3 py-3 active:bg-ink/5">

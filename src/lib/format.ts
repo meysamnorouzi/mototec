@@ -1,7 +1,19 @@
 const numberFormat = new Intl.NumberFormat("fa-IR");
 
+const dateFormat = new Intl.DateTimeFormat("fa-IR", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
 export function formatNumber(value: number) {
   return numberFormat.format(value);
+}
+
+export function formatDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return dateFormat.format(date);
 }
 
 export function toFaDigits(input: string) {

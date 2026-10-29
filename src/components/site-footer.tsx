@@ -4,7 +4,7 @@ import Link from "next/link";
 import { optionalContact, site } from "@/lib/site";
 import type { Category } from "@/lib/types";
 
-export function SiteFooter({ categories }: { categories: Category[] }) {
+export function SiteFooter({ categories, topics }: { categories: Category[]; topics: Category[] }) {
   const extras = [
     optionalContact.whatsapp ? { href: optionalContact.whatsapp, label: "واتساپ" } : null,
     optionalContact.instagram ? { href: optionalContact.instagram, label: "اینستاگرام" } : null,
@@ -14,8 +14,8 @@ export function SiteFooter({ categories }: { categories: Category[] }) {
 
   return (
     <footer className="mt-auto border-t border-line bg-ink text-white">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-4">
-        <div className="md:col-span-2">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
           <Image src="/logo.png" alt="" width={1001} height={627} className="h-12 w-auto brightness-0 invert" />
           <p className="mt-5 max-w-md text-sm leading-7 text-white/70">{site.description}</p>
         </div>
@@ -31,6 +31,23 @@ export function SiteFooter({ categories }: { categories: Category[] }) {
               <li key={category.id}>
                 <Link href={`/shop/${category.slug}`} className="hover:text-white/70">
                   {category.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="text-xs text-white/50">مجله</p>
+          <ul className="mt-4 space-y-2 text-sm">
+            <li>
+              <Link href="/blog" className="hover:text-white/70">
+                همه نوشته‌ها
+              </Link>
+            </li>
+            {topics.map((topic) => (
+              <li key={topic.id}>
+                <Link href={`/blog/category/${topic.slug}`} className="hover:text-white/70">
+                  {topic.name}
                 </Link>
               </li>
             ))}

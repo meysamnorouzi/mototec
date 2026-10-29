@@ -3,6 +3,11 @@ export type Spec = {
   value: string;
 };
 
+export type Faq = {
+  question: string;
+  answer: string;
+};
+
 export type Category = {
   id: number;
   slug: string;
@@ -41,6 +46,8 @@ export type Product = {
   warranty: string;
   shippingStatus: string;
   note: string;
+  faqs: Faq[];
+  featured: boolean;
   categories: { id: number; slug: string; name: string }[];
   modified: string;
 };
@@ -59,4 +66,17 @@ export type ProductList = {
   page: number;
   perPage: number;
   totalPages: number;
+};
+
+export type Post = {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  date: string;
+  modified: string;
+  image: GalleryImage | null;
+  categories: { id: number; slug: string; name: string }[];
+  author: string;
 };

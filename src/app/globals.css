@@ -109,8 +109,37 @@ body {
   }
 }
 
-.rich-text p + p {
+.rich-text h2,
+.rich-text h3,
+.rich-text h4 {
+  margin-top: 1.6rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.rich-text h2 {
+  font-size: 1.5rem;
+}
+
+.rich-text h3 {
+  font-size: 1.2rem;
+}
+
+.rich-text p + p,
+.rich-text figure,
+.rich-text blockquote {
   margin-top: 0.9rem;
+}
+
+.rich-text img {
+  width: 100%;
+  height: auto;
+  border-radius: 1rem;
+}
+
+.rich-text blockquote {
+  border-inline-start: 2px solid var(--color-ink);
+  padding-inline-start: 1rem;
 }
 
 .rich-text ul,

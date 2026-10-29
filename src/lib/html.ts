@@ -23,9 +23,13 @@ const options: sanitizeHtml.IOptions = {
     "tr",
     "th",
     "td",
+    "img",
+    "figure",
+    "figcaption",
   ],
   allowedAttributes: {
     a: ["href", "target", "rel"],
+    img: ["src", "alt", "width", "height"],
     th: ["colspan", "rowspan"],
     td: ["colspan", "rowspan"],
   },
