@@ -52,20 +52,14 @@ type ApiPost = {
 /** WordPress that serves the Mototec catalog and journal. */
 const API_ORIGIN = "https://admin.mototec.ir";
 
-export function isWordPressConfigured() {
-  return Boolean(process.env.MOTOTEC_API_KEY?.trim());
+function apiOrigin() {
+  const configured = process.env.NEXT_PUBLIC_WORDPRESS_URL?.trim() || process.env.WORDPRESS_URL?.trim();
+  return (configured || API_ORIGIN).replace(/\/+$/, "");
 }
 
-function wordpressConfig() {
-  const key = process.env.MOTOTEC_API_KEY?.trim();
-  if (!key) return null;
-  const url = (process.env.WORDPRESS_URL?.trim() || API_ORIGIN).replace(/\/+$/, "");
-  return { url, key };
-}
-
-function apiEndpoint(origin: string, path: string, query: Record<string, string>) {
+function apiEndpoint(path: string, query: Record<string, string>) {
   // This host has no /wp-json rewrite. WordPress publishes REST on index.php?rest_route=.
-  const endpoint = new URL("index.php", `${origin}/`);
+  const endpoint = new URL("index.php", `${apiOrigin()}/`);
   endpoint.searchParams.set("rest_route", `/mototec/v1/${path.replace(/^\/+/, "")}`);
   for (const [key, value] of Object.entries(query)) {
     endpoint.searchParams.set(key, value);
@@ -74,20 +68,10 @@ function apiEndpoint(origin: string, path: string, query: Record<string, string>
 }
 
 async function apiFetch<T>(path: string, query: Record<string, string> = {}) {
-  const config = wordpressConfig();
-  if (!config) {
-    throw new Error("WordPress is not configured");
-  }
-
-  const endpoint = apiEndpoint(config.url, path, query);
-  const headers: Record<string, string> = {
-    Accept: "application/json",
-    "X-Mototec-Key": config.key,
-  };
-
+  const endpoint = apiEndpoint(path, query);
   const response = await fetch(endpoint, {
-    headers,
-    cache: "force-cache",
+    headers: { Accept: "application/json" },
+    cache: "no-store",
   });
 
   if (!response.ok) {

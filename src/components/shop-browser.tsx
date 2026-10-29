@@ -101,12 +101,12 @@ export function ShopCatalog({
         <ul className="mt-5 flex gap-2 overflow-x-auto pb-1">
           {chips.map((category) => (
             <li key={category.id}>
-              <Link
-                href={`/shop/${category.slug}`}
+              <a
+                href={`/shop/${category.slug}/`}
                 className="inline-flex shrink-0 rounded-full bg-paper px-4 py-2 text-sm transition active:scale-95"
               >
                 {category.name}
-              </Link>
+              </a>
             </li>
           ))}
         </ul>

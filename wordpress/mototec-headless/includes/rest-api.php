@@ -5,6 +5,8 @@ if (!defined('ABSPATH')) {
 }
 
 add_action('rest_api_init', 'mototec_register_routes');
+add_filter('rest_post_dispatch', 'mototec_rest_nocache', 10, 3);
+add_filter('rest_pre_serve_request', 'mototec_rest_cors', 20);
 
 function mototec_register_routes() {
     $routes = [
@@ -23,13 +25,64 @@ function mototec_register_routes() {
     }
 }
 
-function mototec_rest_permission(WP_REST_Request $request) {
-    $key = (string) get_option('mototec_api_key', '');
-    $sent = (string) $request->get_header('x-mototec-key');
-    if ($key !== '' && $sent !== '' && hash_equals($key, $sent)) {
-        return true;
+function mototec_allowed_origin() {
+    $origin = get_http_origin();
+    if (!is_string($origin) || $origin === '') {
+        return '';
     }
-    return new WP_Error('mototec_forbidden', 'کلید API نادرست است.', ['status' => 401]);
+
+    $sites = [
+        'https://mototec.ir',
+        'https://www.mototec.ir',
+    ];
+    if (in_array($origin, $sites, true)) {
+        return $origin;
+    }
+
+    $parts = wp_parse_url($origin);
+    if (!is_array($parts)) {
+        return '';
+    }
+    $scheme = isset($parts['scheme']) ? $parts['scheme'] : '';
+    $host = isset($parts['host']) ? $parts['host'] : '';
+    if (($scheme === 'http' || $scheme === 'https') && ($host === 'localhost' || $host === '127.0.0.1')) {
+        return $origin;
+    }
+
+    return '';
+}
+
+function mototec_rest_permission() {
+    if (mototec_allowed_origin() === '') {
+        return new WP_Error('mototec_forbidden', 'این درخواست مجاز نیست.', ['status' => 403]);
+    }
+    return true;
+}
+
+function mototec_rest_cors($served) {
+    $route = isset($GLOBALS['wp']->query_vars['rest_route']) ? (string) $GLOBALS['wp']->query_vars['rest_route'] : '';
+    if (strpos($route, '/mototec/v1') !== 0) {
+        return $served;
+    }
+
+    $origin = mototec_allowed_origin();
+    if ($origin === '') {
+        header_remove('Access-Control-Allow-Origin');
+        header_remove('Access-Control-Allow-Credentials');
+        return $served;
+    }
+
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin', false);
+    return $served;
+}
+
+function mototec_rest_nocache($result, $server, WP_REST_Request $request) {
+    $route = (string) $request->get_route();
+    if (strpos($route, '/mototec/v1') === 0) {
+        $result->header('Cache-Control', 'no-store');
+    }
+    return $result;
 }
 
 function mototec_request_page(WP_REST_Request $request) {

@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { formatDate } from "@/lib/format";
 import type { Post } from "@/lib/types";
 
@@ -9,14 +7,14 @@ export function PostCard({ post }: { post: Post }) {
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-panel shadow-[0_20px_50px_-32px_rgba(0,0,0,0.65)] transition duration-500 hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-28px_rgba(0,0,0,0.55)]">
-      <Link href={`/blog/${post.slug}`} className="contents">
+      <a href={`/blog/${post.slug}/`} className="contents">
         <div className="relative aspect-[4/3] overflow-hidden bg-ink">
           {post.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={post.image.src} alt={post.image.alt || post.title} className="shot h-full w-full object-cover" />
           ) : (
             <div className="flex h-full items-end bg-ink p-5 text-white">
-              <p className="text-sm text-white/70">{category || "مجله"}</p>
+              <p className="text-sm text-white/70">{category || "بلاگ"}</p>
             </div>
           )}
         </div>
@@ -25,7 +23,7 @@ export function PostCard({ post }: { post: Post }) {
           <h2 className="text-lg font-semibold leading-8">{post.title}</h2>
           <p className="line-clamp-3 text-sm leading-7 text-graphite">{post.excerpt}</p>
         </div>
-      </Link>
+      </a>
     </article>
   );
 }

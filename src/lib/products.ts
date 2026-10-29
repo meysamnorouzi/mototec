@@ -1,14 +1,11 @@
 import { cache } from "react";
 
 import { browseProducts } from "./browse";
-import { fallbackCategories, fallbackProducts } from "./catalog";
 import type { Category, Product, ProductList, ProductQuery } from "./types";
-import { fetchWpCategories, fetchWpProducts, isWordPressConfigured } from "./wp";
-
-export { isWordPressConfigured };
+import { fetchWpCategories, fetchWpProducts } from "./wp";
 
 export const getCategories = cache(async () => {
-  return isWordPressConfigured() ? fetchWpCategories() : fallbackCategories;
+  return fetchWpCategories();
 });
 
 export function categoryTree(categories: Category[]) {
@@ -25,7 +22,6 @@ export async function getCategoryBySlug(slug: string) {
 }
 
 export const getAllProducts = cache(async () => {
-  if (!isWordPressConfigured()) return fallbackProducts;
   return fetchWpProducts();
 });
 
@@ -68,6 +64,19 @@ export function findCategory(categories: Category[], slug: string): Category | n
     if (child) return child;
   }
   return null;
+}
+
+export function productsInCategory(products: Product[], categories: Category[], slug: string) {
+  const category = findCategory(categories, slug);
+  const slugs = new Set(category ? collectSlugs(category) : [slug]);
+  return products.filter((product) => product.categories.some((item) => slugs.has(item.slug)));
+}
+
+export function relatedProducts(products: Product[], product: Product, limit = 4) {
+  const slugs = new Set(product.categories.map((category) => category.slug));
+  return products
+    .filter((item) => item.id !== product.id && item.categories.some((category) => slugs.has(category.slug)))
+    .slice(0, limit);
 }
 
 export function categoryTrail(categories: Category[], slug: string): Category[] {

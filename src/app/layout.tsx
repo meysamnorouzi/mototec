@@ -4,8 +4,6 @@ import Link from "next/link";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getPostCategoryTree } from "@/lib/posts";
-import { getAllProducts, getCategoryTree } from "@/lib/products";
 import { site } from "@/lib/site";
 
 import "./globals.css";
@@ -36,7 +34,7 @@ export const metadata: Metadata = {
     "اینترکام کلاه کاسکت",
     "بلوتوث موتور",
     "لوازم موتورسیکلت",
-    "مجله موتوتک",
+    "بلاگ موتوتک",
   ],
   robots: {
     index: true,
@@ -62,19 +60,7 @@ export const metadata: Metadata = {
   formatDetection: { telephone: true, email: false, address: false },
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [categories, products, topics] = await Promise.all([
-    getCategoryTree(),
-    getAllProducts(),
-    getPostCategoryTree(),
-  ]);
-  const menuProducts = products.map((product) => ({
-    id: product.id,
-    slug: product.slug,
-    name: product.name,
-    categorySlugs: product.categories.map((category) => category.slug),
-  }));
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -116,11 +102,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         >
           رفتن به محتوا
         </a>
-        <SiteHeader categories={categories} products={menuProducts} />
+        <SiteHeader />
         <main id="content" className="flex-1 pb-24 md:pb-0">
           {children}
         </main>
-        <SiteFooter categories={categories} topics={topics} />
+        <SiteFooter />
         <nav
           className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-ink/90 pb-[env(safe-area-inset-bottom)] text-white backdrop-blur-md md:hidden"
           aria-label="میانبر"
@@ -138,7 +124,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </li>
             <li>
               <Link href="/blog" className="block px-2 py-3 active:bg-white/10">
-                مجله
+                بلاگ
               </Link>
             </li>
             <li>

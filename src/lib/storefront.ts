@@ -10,8 +10,6 @@ export const storefrontCategoryOrder = [
   "travel-gear",
 ] as const;
 
-export const knownBrands = ["AZDOME", "Lingdu", "Maxto"] as const;
-
 export const whyMototec = [
   {
     title: "انتخاب تخصصی محصولات",
@@ -78,21 +76,16 @@ export function orderedStorefrontCategories(tree: Category[]): Category[] {
 }
 
 export function productBrands(products: Product[]): string[] {
-  const fromProducts = products
-    .map((product) => product.brand.trim())
-    .filter(Boolean);
-  const merged = [...knownBrands, ...fromProducts];
   const seen = new Set<string>();
   const brands: string[] = [];
-  for (const brand of merged) {
+  for (const product of products) {
+    const brand = product.brand.trim();
     const key = brand.toLowerCase();
-    if (seen.has(key)) continue;
+    if (!brand || seen.has(key)) continue;
     seen.add(key);
     brands.push(brand);
   }
-  return brands.filter((brand) =>
-    fromProducts.some((item) => item.toLowerCase() === brand.toLowerCase()),
-  );
+  return brands;
 }
 
 export function featuredProducts(products: Product[], limit = 8): Product[] {

@@ -39,18 +39,18 @@ function mototec_settings_page() {
     <div class="wrap">
         <h1>موتوتک هدلس</h1>
         <?php if (isset($_GET['mototec-updated'])) : ?>
-            <div class="notice notice-success is-dismissible"><p>کلید تازه ساخته شد. آن را در <code>MOTOTEC_API_KEY</code> سایت بگذارید و دوباره بیلد بگیرید.</p></div>
+            <div class="notice notice-success is-dismissible"><p>کلید تازه ساخته شد. فروشگاه برای خواندن محصولات و نوشته‌ها به این کلید نیاز ندارد.</p></div>
         <?php endif; ?>
         <?php if (!class_exists('WooCommerce')) : ?>
-            <div class="notice notice-warning"><p>ووکامرس فعال نیست. مجله کار می‌کند، ولی محصولات تا فعال شدن ووکامرس خالی می‌مانند.</p></div>
+            <div class="notice notice-warning"><p>ووکامرس فعال نیست. بلاگ کار می‌کند، ولی محصولات تا فعال شدن ووکامرس خالی می‌مانند.</p></div>
         <?php endif; ?>
-        <p>محصولات از ووکامرس و نوشته‌ها از بخش نوشته‌های وردپرس خوانده می‌شوند. سایت استاتیک این آدرس‌ها را هنگام بیلد می‌گیرد.</p>
+        <p>محصولات از ووکامرس و نوشته‌ها از بخش نوشته‌های وردپرس خوانده می‌شوند. فروشگاه این آدرس‌ها را در مرورگر می‌خواند، پس محصول یا نوشتهٔ تازه بدون بیلد دوباره روی سایت می‌آید. فقط <code>https://mototec.ir</code>، <code>https://www.mototec.ir</code> و لوکال‌هاست اجازهٔ خواندن دارند.</p>
         <table class="form-table" role="presentation">
             <tr>
                 <th scope="row"><label for="mototec-api-key">کلید API</label></th>
                 <td>
                     <input id="mototec-api-key" class="regular-text code" type="text" readonly value="<?php echo esc_attr($key); ?>" />
-                    <p class="description">در هدر <code>X-Mototec-Key</code> فرستاده می‌شود.</p>
+                    <p class="description">خواندن فروشگاه و بلاگ به این کلید نیاز ندارد.</p>
                 </td>
             </tr>
         </table>
@@ -65,7 +65,7 @@ function mototec_settings_page() {
                 <li><code><?php echo esc_html($base . $route); ?></code></li>
             <?php endforeach; ?>
         </ul>
-        <p>مشخصات محصول را در زبانه «موتوتک» ووکامرس بنویسید. مجله همان نوشته‌های منتشرشده وردپرس است؛ تصویر شاخص، دسته و خلاصه روی سایت می‌آیند.</p>
+        <p>مشخصات محصول را در زبانه «موتوتک» ووکامرس بنویسید. بلاگ همان نوشته‌های منتشرشده وردپرس است؛ تصویر شاخص، دسته و خلاصه روی سایت می‌آیند.</p>
     </div>
     <?php
 }

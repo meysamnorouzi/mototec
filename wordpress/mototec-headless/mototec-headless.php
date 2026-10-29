@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: موتوتک هدلس
- * Description: فیلدهای محصول موتوتک و API هدلس برای محصولات، دسته‌ها و مجله.
+ * Description: فیلدهای محصول موتوتک و API هدلس برای محصولات، دسته‌ها و بلاگ.
  * Version: 1.0.0
  * Author: MotoTec
  * Text Domain: mototec-headless

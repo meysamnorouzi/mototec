@@ -1,40 +1,19 @@
-# Copied into `out/` by `next build`. Upload the contents of `out` to public_html.
-Options -MultiViews
-DirectoryIndex index.html
-AddDefaultCharset UTF-8
+RewriteEngine On
 
-<IfModule mod_rewrite.c>
-  RewriteEngine On
+# Unknown catalog and journal URLs use the section shell.
+# The page reads the real address in the browser and loads that item from the API.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^product/([^/]+)/?$ /product/index.html [L]
 
-  # /about -> /about/ when that exported folder exists
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} !/$
-  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}/index.html -f
-  RewriteRule ^ %{REQUEST_URI}/ [R=301,L,QSA]
-</IfModule>
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^shop/([^/]+)/?$ /shop/index.html [L]
 
-ErrorDocument 404 /404.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^blog/category/([^/]+)/?$ /blog/category/index.html [L]
 
-<IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript application/json image/svg+xml
-</IfModule>
-
-<IfModule mod_headers.c>
-  <FilesMatch "\.html$">
-    Header set Cache-Control "no-cache"
-  </FilesMatch>
-  <If "%{REQUEST_URI} =~ m#^/_next/static/#">
-    Header set Cache-Control "public, max-age=31536000, immutable"
-  </If>
-</IfModule>
-
-<IfModule mod_expires.c>
-  ExpiresActive On
-  ExpiresByType text/css "access plus 1 year"
-  ExpiresByType application/javascript "access plus 1 year"
-  ExpiresByType font/woff2 "access plus 1 year"
-  ExpiresByType image/jpeg "access plus 7 days"
-  ExpiresByType image/png "access plus 7 days"
-  ExpiresByType image/webp "access plus 7 days"
-  ExpiresByType image/svg+xml "access plus 7 days"
-</IfModule>
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^blog/([^/]+)/?$ /blog/index.html [L]

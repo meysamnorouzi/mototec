@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export function Breadcrumbs({ items }: { items: { href?: string; label: string }[] }) {
   return (
     <nav aria-label="مسیر" className="text-sm text-graphite">
@@ -10,9 +8,9 @@ export function Breadcrumbs({ items }: { items: { href?: string; label: string }
             <li key={`${item.label}-${index}`} className="flex items-center gap-2">
               {index > 0 ? <span aria-hidden="true">/</span> : null}
               {item.href && !last ? (
-                <Link href={item.href} className="hover:text-ink">
+                <a href={item.href} className="hover:text-ink">
                   {item.label}
-                </Link>
+                </a>
               ) : (
                 <span className={last ? "text-ink" : undefined}>{item.label}</span>
               )}

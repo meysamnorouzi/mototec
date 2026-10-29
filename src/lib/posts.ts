@@ -1,13 +1,12 @@
 import { cache } from "react";
 
 import { stripHtml } from "./format";
-import { fallbackPostCategories, fallbackPosts } from "./journal";
 import { categoryTrail, categoryTree, findCategory } from "./products";
 import type { Category, Post } from "./types";
-import { fetchWpPostCategories, fetchWpPosts, isWordPressConfigured } from "./wp";
+import { fetchWpPostCategories, fetchWpPosts } from "./wp";
 
 export const getPostCategories = cache(async () => {
-  return isWordPressConfigured() ? fetchWpPostCategories() : fallbackPostCategories;
+  return fetchWpPostCategories();
 });
 
 export const getPostCategoryTree = cache(async () => {
@@ -23,7 +22,7 @@ export function postCategoryTrail(categories: Category[], slug: string) {
 }
 
 export const getAllPosts = cache(async () => {
-  const posts = isWordPressConfigured() ? await fetchWpPosts() : fallbackPosts;
+  const posts = await fetchWpPosts();
   return [...posts].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.id - a.id));
 });
 
@@ -40,6 +39,25 @@ export async function getPostsByCategory(slug: string) {
 
 export async function getRelatedPosts(post: Post, limit = 3) {
   const posts = await getAllPosts();
+  const slugs = new Set(post.categories.map((category) => category.slug));
+  const related = posts.filter(
+    (item) => item.id !== post.id && item.categories.some((category) => slugs.has(category.slug)),
+  );
+  const rest = posts.filter((item) => item.id !== post.id && !related.includes(item));
+  return [...related, ...rest].slice(0, limit);
+}
+
+export function sortPosts(posts: Post[]) {
+  return [...posts].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.id - a.id));
+}
+
+export function postsInCategory(posts: Post[], categories: Category[], slug: string) {
+  const category = findCategory(categories, slug);
+  const slugs = new Set(category ? collectSlugs(category) : [slug]);
+  return posts.filter((post) => post.categories.some((item) => slugs.has(item.slug)));
+}
+
+export function relatedPosts(posts: Post[], post: Post, limit = 3) {
   const slugs = new Set(post.categories.map((category) => category.slug));
   const related = posts.filter(
     (item) => item.id !== post.id && item.categories.some((category) => slugs.has(category.slug)),

@@ -1,10 +1,31 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
+import { loadCategoryTree, loadPostCategoryTree } from "@/lib/live";
 import { optionalContact, site } from "@/lib/site";
+import { orderedStorefrontCategories } from "@/lib/storefront";
 import type { Category } from "@/lib/types";
 
-export function SiteFooter({ categories, topics }: { categories: Category[]; topics: Category[] }) {
+export function SiteFooter() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [topics, setTopics] = useState<Category[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([loadCategoryTree(), loadPostCategoryTree()])
+      .then(([tree, postTree]) => {
+        if (!active) return;
+        setCategories(orderedStorefrontCategories(tree));
+        setTopics(postTree);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
   const extras = [
     optionalContact.whatsapp ? { href: optionalContact.whatsapp, label: "واتساپ" } : null,
     optionalContact.instagram ? { href: optionalContact.instagram, label: "اینستاگرام" } : null,
@@ -29,15 +50,15 @@ export function SiteFooter({ categories, topics }: { categories: Category[]; top
             </li>
             {categories.map((category) => (
               <li key={category.id}>
-                <Link href={`/shop/${category.slug}`} className="hover:text-white/70">
+                <a href={`/shop/${category.slug}/`} className="hover:text-white/70">
                   {category.name}
-                </Link>
+                </a>
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <p className="text-xs text-white/50">مجله</p>
+          <p className="text-xs text-white/50">بلاگ</p>
           <ul className="mt-4 space-y-2 text-sm">
             <li>
               <Link href="/blog" className="hover:text-white/70">
@@ -46,9 +67,9 @@ export function SiteFooter({ categories, topics }: { categories: Category[]; top
             </li>
             {topics.map((topic) => (
               <li key={topic.id}>
-                <Link href={`/blog/category/${topic.slug}`} className="hover:text-white/70">
+                <a href={`/blog/category/${topic.slug}/`} className="hover:text-white/70">
                   {topic.name}
-                </Link>
+                </a>
               </li>
             ))}
           </ul>

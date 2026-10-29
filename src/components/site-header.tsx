@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { loadCategoryTree, loadProducts, menuProducts } from "@/lib/live";
 import { site } from "@/lib/site";
+import { orderedStorefrontCategories } from "@/lib/storefront";
 import type { Category } from "@/lib/types";
 
 type MenuProduct = {
@@ -14,10 +16,28 @@ type MenuProduct = {
   categorySlugs: string[];
 };
 
-export function SiteHeader({ categories, products }: { categories: Category[]; products: MenuProduct[] }) {
+export function SiteHeader() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<MenuProduct[]>([]);
   const [open, setOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
-  const [activeId, setActiveId] = useState<number | null>(categories[0]?.id ?? null);
+  const [activeId, setActiveId] = useState<number | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([loadCategoryTree(), loadProducts()])
+      .then(([tree, items]) => {
+        if (!active) return;
+        const ordered = orderedStorefrontCategories(tree);
+        setCategories(ordered);
+        setProducts(menuProducts(items));
+        setActiveId((current) => current ?? ordered[0]?.id ?? null);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
   const active = categories.find((category) => category.id === activeId) ?? categories[0];
 
   function productsIn(slug: string) {
@@ -56,12 +76,12 @@ export function SiteHeader({ categories, products }: { categories: Category[]; p
                       </li>
                       {categories.map((category) => (
                         <li key={category.id} onMouseEnter={() => setActiveId(category.id)}>
-                          <Link
-                            href={`/shop/${category.slug}`}
+                          <a
+                            href={`/shop/${category.slug}/`}
                             className={`mt-1 block rounded-xl px-3 py-2.5 ${active?.id === category.id ? "bg-ink text-white" : "hover:bg-panel"}`}
                           >
                             {category.name}
-                          </Link>
+                          </a>
                         </li>
                       ))}
                     </ul>
@@ -74,7 +94,7 @@ export function SiteHeader({ categories, products }: { categories: Category[]; p
             ) : null}
           </div>
           <Link href="/blog" className="hover:text-graphite">
-            مجله
+            بلاگ
           </Link>
           <Link href="/about" className="hover:text-graphite">
             درباره ما
@@ -117,9 +137,9 @@ export function SiteHeader({ categories, products }: { categories: Category[]; p
               <ul className="space-y-1 ps-3">
                 {categories.map((category) => (
                   <li key={category.id}>
-                    <Link href={`/shop/${category.slug}`} onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2.5 active:bg-ink/5">
+                    <a href={`/shop/${category.slug}/`} onClick={() => setOpen(false)} className="block rounded-xl px-3 py-2.5 active:bg-ink/5">
                       {category.name}
-                    </Link>
+                    </a>
                     <ProductBranch category={category} products={products} onNavigate={() => setOpen(false)} />
                   </li>
                 ))}
@@ -127,7 +147,7 @@ export function SiteHeader({ categories, products }: { categories: Category[]; p
             </li>
             <li>
               <Link href="/blog" onClick={() => setOpen(false)} className="block rounded-2xl px-3 py-3 active:bg-ink/5">
-                مجله
+                بلاگ
               </Link>
             </li>
             <li>
@@ -161,15 +181,15 @@ function ShopFlyout({
         <ul className="mt-3 space-y-4">
           {category.children.map((child) => (
             <li key={child.id}>
-              <Link href={`/shop/${child.slug}`} className="text-sm font-medium hover:text-graphite">
+              <a href={`/shop/${child.slug}/`} className="text-sm font-medium hover:text-graphite">
                 {child.name}
-              </Link>
+              </a>
               <ul className="mt-1">
                 {productsIn(child.slug).map((product) => (
                   <li key={product.id}>
-                    <Link href={`/product/${product.slug}`} className="block rounded-lg px-2 py-1.5 text-sm text-graphite hover:bg-paper hover:text-ink">
+                    <a href={`/product/${product.slug}/`} className="block rounded-lg px-2 py-1.5 text-sm text-graphite hover:bg-paper hover:text-ink">
                       {product.name}
-                    </Link>
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -189,9 +209,9 @@ function ShopFlyout({
       <ul className="mt-3">
         {items.map((product) => (
           <li key={product.id}>
-            <Link href={`/product/${product.slug}`} className="block rounded-lg px-2 py-2 text-sm hover:bg-paper">
+            <a href={`/product/${product.slug}/`} className="block rounded-lg px-2 py-2 text-sm hover:bg-paper">
               {product.name}
-            </Link>
+            </a>
           </li>
         ))}
       </ul>
@@ -217,17 +237,17 @@ function ProductBranch({
     <ul className="mt-2 space-y-1 border-s border-line ps-3 text-sm text-graphite">
       {category.children.map((child) => (
         <li key={child.id}>
-          <Link href={`/shop/${child.slug}`} onClick={onNavigate} className="block py-2">
+          <a href={`/shop/${child.slug}/`} onClick={onNavigate} className="block py-2">
             {child.name}
-          </Link>
+          </a>
           <ul className="space-y-1 ps-3">
             {products
               .filter((product) => product.categorySlugs.includes(child.slug))
               .map((product) => (
                 <li key={product.id}>
-                  <Link href={`/product/${product.slug}`} onClick={onNavigate} className="block py-1.5 text-ink">
+                  <a href={`/product/${product.slug}/`} onClick={onNavigate} className="block py-1.5 text-ink">
                     {product.name}
-                  </Link>
+                  </a>
                 </li>
               ))}
           </ul>
@@ -235,9 +255,9 @@ function ProductBranch({
       ))}
       {(category.children.length ? [] : owned.length ? owned : direct).map((product) => (
         <li key={product.id}>
-          <Link href={`/product/${product.slug}`} onClick={onNavigate} className="block py-1.5 text-ink">
+          <a href={`/product/${product.slug}/`} onClick={onNavigate} className="block py-1.5 text-ink">
             {product.name}
-          </Link>
+          </a>
         </li>
       ))}
     </ul>
