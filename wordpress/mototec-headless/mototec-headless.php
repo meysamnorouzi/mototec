@@ -16,6 +16,7 @@ define('MOTOTEC_HEADLESS_VERSION', '1.0.0');
 require_once __DIR__ . '/includes/product-fields.php';
 require_once __DIR__ . '/includes/settings.php';
 require_once __DIR__ . '/includes/rest-api.php';
+require_once __DIR__ . '/includes/catalog-import.php';
 
 register_activation_hook(__FILE__, 'mototec_activate');
 

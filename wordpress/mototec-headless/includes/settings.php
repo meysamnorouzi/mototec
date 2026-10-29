@@ -41,6 +41,11 @@ function mototec_settings_page() {
         <?php if (isset($_GET['mototec-updated'])) : ?>
             <div class="notice notice-success is-dismissible"><p>کلید تازه ساخته شد. فروشگاه برای خواندن محصولات و نوشته‌ها به این کلید نیاز ندارد.</p></div>
         <?php endif; ?>
+        <?php if (isset($_GET['mototec-import']) && $_GET['mototec-import'] === '1') : ?>
+            <div class="notice notice-success is-dismissible"><p><?php echo esc_html((string) (int) $_GET['mototec-count']); ?> محصول نمونه در ووکامرس ساخته یا به‌روز شد. فروشگاه همان‌ها را نشان می‌دهد.</p></div>
+        <?php elseif (isset($_GET['mototec-import']) && $_GET['mototec-import'] === 'error') : ?>
+            <div class="notice notice-error is-dismissible"><p>وارد کردن انجام نشد. اول ووکامرس را فعال کنید.</p></div>
+        <?php endif; ?>
         <?php if (!class_exists('WooCommerce')) : ?>
             <div class="notice notice-warning"><p>ووکامرس فعال نیست. بلاگ کار می‌کند، ولی محصولات تا فعال شدن ووکامرس خالی می‌مانند.</p></div>
         <?php endif; ?>
@@ -58,6 +63,13 @@ function mototec_settings_page() {
             <?php wp_nonce_field('mototec_regenerate_key'); ?>
             <input type="hidden" name="action" value="mototec_regenerate_key" />
             <?php submit_button('ساخت کلید جدید', 'secondary'); ?>
+        </form>
+        <h2>محصولات نمونه</h2>
+        <p>چهار محصول قبلی فروشگاه، با همان نام، قیمت، دسته، عکس، مشخصات و سوال‌ها، وارد ووکامرس می‌شوند. اگر دوباره بزنید، همان محصولات به‌روز می‌شوند و تکراری ساخته نمی‌شود.</p>
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+            <?php wp_nonce_field('mototec_import_catalog'); ?>
+            <input type="hidden" name="action" value="mototec_import_catalog" />
+            <?php submit_button('وارد کردن محصولات نمونه', 'primary'); ?>
         </form>
         <h2>مسیرها</h2>
         <ul>
